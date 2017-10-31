@@ -1,9 +1,5 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: MyString
-  brewery: MyString
-
-two:
-  name: MyString
-  brewery: MyString
+fat_tire:
+  name: "Fat Tire"
+  brewery: "New Belgium"

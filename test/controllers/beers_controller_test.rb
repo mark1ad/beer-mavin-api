@@ -2,7 +2,23 @@ require 'test_helper'
 
 class BeersControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @beer = beers(:one)
+    @beer = beers(:fat_tire)
+  end
+
+  test "create without name" do
+    assert_no_difference('Beer.count') do
+      post beers_url, params: { beer: { brewery: @beer.brewery } }, as: :json
+    end
+
+    assert_response 422
+  end
+
+  def test_create_without_brewery
+    assert_no_difference('Beer.count') do
+      post beers_url, params: { beer: { name: @beer.name } }, as: :json
+    end
+
+    assert_response 422
   end
 
   test "should get index" do
