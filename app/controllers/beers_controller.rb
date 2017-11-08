@@ -1,5 +1,13 @@
+require 'http'
+
 class BeersController < ApplicationController
   before_action :set_beer, only: [:show, :update, :destroy]
+
+  # TODO: Zippy is for playing. Remove
+  # POST /beers/zippy
+  def zippy
+    do_zippy
+  end
 
   # GET /beers
   def index
@@ -47,5 +55,32 @@ class BeersController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def beer_params
       params.require(:beer).permit(:name, :brewery)
+    end
+
+    # Example call to brewerydb.com. Gets information for Fat Tire
+    def do_zippy
+      puts "do_zippy"
+      print params, "\n"
+      beer_name = params["name"]
+      puts "beer_name #{beer_name}"
+      response = HTTP.get('http://api.brewerydb.com/v2/beers',
+        :params=> {
+          :key => ENV["BREWERYDB_BEERRATER_KEY"],
+          :name => beer_name
+        }
+      )
+
+      puts "\n************\n#{response.code}"
+      puts "response #{response}"
+      body = response.parse
+      puts "body #{body}"
+
+      # Check for success
+      if body["status"] == "success"
+        data = body["data"]
+        render json: { status: 200, message: "Zippy!", data: data[0]}
+      else
+        render json: { status: 401, message: body["errorMessage"] }
+      end
     end
 end
