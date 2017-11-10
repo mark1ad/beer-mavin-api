@@ -3,10 +3,9 @@ require 'http'
 class BeersController < ApplicationController
   before_action :set_beer, only: [:show, :update, :destroy]
 
-  # TODO: Zippy is for playing. Remove
-  # POST /beers/zippy
-  def zippy
-    do_zippy
+  # GET /beers/search
+  def search
+    find_beers
   end
 
   # GET /beers
@@ -57,28 +56,31 @@ class BeersController < ApplicationController
       params.require(:beer).permit(:name, :brewery)
     end
 
-    # Example call to brewerydb.com. Gets information for Fat Tire
-    def do_zippy
-      puts "do_zippy"
-      print params, "\n"
-      beer_name = params["name"]
-      puts "beer_name #{beer_name}"
+    # Searches for beers on brewerydb.com
+    def find_beers
+      # Use wild cards to get any beer with search string in name
+      beer_name = "*#{params['name']}*"
       response = HTTP.get('http://api.brewerydb.com/v2/beers',
         :params=> {
           :key => ENV["BREWERYDB_BEERRATER_KEY"],
-          :name => beer_name
+          :name => beer_name,
+          :withBreweries => "y"
         }
       )
 
-      puts "\n************\n#{response.code}"
-      puts "response #{response}"
       body = response.parse
-      puts "body #{body}"
 
-      # Check for success
+      # check for success
       if body["status"] == "success"
         data = body["data"]
-        render json: { status: 200, message: "Zippy!", data: data[0]}
+        unless data.nil?
+          render json: { status: 200, message: "#{params['name']} found", data: data}
+        else
+          render json: {
+            status: 200,
+            message: "#{params['name']} not found",
+            data: []}
+        end
       else
         render json: { status: 401, message: body["errorMessage"] }
       end
