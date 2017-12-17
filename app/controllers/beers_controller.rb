@@ -8,6 +8,12 @@ class BeersController < ApplicationController
     find_beers
   end
 
+  # GET /beers/by_id
+  # Get beer information using brewerydb.com id
+  def by_id
+    get_beer
+  end
+
   # GET /beers
   def index
     @beers = Beer.all
@@ -54,6 +60,38 @@ class BeersController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def beer_params
       params.require(:beer).permit(:name, :brewery)
+    end
+
+    # get a beer from brewerydb.com using the beer's id
+    def get_beer
+      beer_id = params['id'];
+      response = HTTP.get('http://api.brewerydb.com/v2/beer/' + beer_id,
+        :params=> {
+          :key => ENV["BREWERYDB_BEERRATER_KEY"],
+          :withBreweries => "y"
+        }
+      )
+
+      body = response.parse
+
+      # check for success
+      if body["status"] == "success"
+        data = body["data"]
+        unless data.nil?
+          render json: {
+            status: 200,
+            message: "#{params['id']} found",
+            data: data}
+        else
+          render json: {
+            status: 200,
+            message: "#{params['id']} not found",
+            data: []
+          }
+        end
+      else
+        render json: { status: 401, message: body["errorMessage"]}
+      end
     end
 
     # Searches for beers on brewerydb.com
