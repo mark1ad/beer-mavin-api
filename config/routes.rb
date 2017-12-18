@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
   resources :beers do
     collection do
-      get '/search', to: 'beers#search'
+      get '/search', to: 'beers#search';
+      get '/by_id', to: 'beers#by_id'
     end
   end
 
