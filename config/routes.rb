@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
-  resources :users
+  resources :users do
+    collection do
+      post '/login', to: 'users#login'
+    end
+  end
+
   resources :breweries do
     collection do
       get '/by_id', to: 'breweries#by_id'
