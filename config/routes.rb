@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :users
   resources :breweries do
     collection do
       get '/by_id', to: 'breweries#by_id'
