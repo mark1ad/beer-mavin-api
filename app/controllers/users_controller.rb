@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :update, :destroy]
-  before_action :authenticate_token, except: [:login, :create]
+  before_action :authenticate_token, except: [:login, :create, :index]
   before_action :authorize_user, except: [:login, :create, :index]
 
   def login
@@ -75,6 +75,6 @@ class UsersController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def user_params
-      params.require(:user).permit(:username, :password_digest)
+      params.require(:user).permit(:username, :password)
     end
 end
